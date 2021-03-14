@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from os import listdir
+from os.path import isfile
+from shutil import copyfile
 from subprocess import CalledProcessError, run
 from sys import argv, version_info
 
@@ -95,6 +97,8 @@ class CmdHandler:
 
 
 if __name__ == "__main__":
+    if not isfile("./.env"):
+        copyfile("./default.env", ".env")
     if len(argv) < 2:
         argv.append("available_commands")
         if not hasattr(CmdHandler, argv[1]):
