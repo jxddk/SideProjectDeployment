@@ -107,7 +107,7 @@ if __name__ == "__main__":
     if not isfile("./.env"):
         copyfile("./default.env", ".env")
     if system() == "Linux":
-        run(["chmod", "+x", "./entrypoints/*.sh"])
+        run(["chmod", "+x", "./entrypoints/*.sh"], capture_output=True)
     handler = CmdHandler()
     result = getattr(CmdHandler(), argv[1])(*argv[2:])
     print(f"{argv[1]} completed{': ' + result if result else ''}")
