@@ -54,12 +54,12 @@ class CmdHandler:
         self._run(["docker-compose", "rm", "-f"])
         self.docker_compose_up()
 
-    def registry_create_password(self, usr, pwd, *args, **kwargs):
+    def registry_create_password(self, usr, pw, *args, **kwargs):
         self.docker_compose_up()
         compose_name = self._get_compose_project_name()
         docker = ["docker", "exec", f"{compose_name}_registry"]
         self._run(docker + ["apk", "add", "apache2-utils"])
-        self._run(docker + ["htpasswd", "-B", "-b", "c", "registry.password", usr, pwd])
+        self._run(docker + ["htpasswd", "-B", "-b", "-c", "registry.password", usr, pw])
 
     def certbot_new_domain(self, domain, email, *args, **kwargs):
         self.docker_compose_up()
