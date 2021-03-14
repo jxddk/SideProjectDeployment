@@ -35,7 +35,7 @@ Management commands are collected in [cmd.py](./cmd.py), which is written for Py
 - `cmd.py docker_compose_down`: Spins down the aforementioned composition.
 - `cmd.py docker_compose_reload`: Restarts Docker composition.
 - `cmd.py registry_create_password <username> <password>`: Sets the authentication for the Docker registry to the given username and password.
-- `cmd.py certbot_new_domain <domain> <email>`: Gets a new certificate for the given domain, registered to the given email. Add `wildcard` to the argument list to generate a wildcard certificate for the given domain (requires DNS verification).
+- `cmd.py certbot_new_domain <domain> <email>`: Gets a new certificate for the given domain, registered to the given email. This uses an HTTP verification challenge, which means wildcard certificates cannot be generated.
 
 ## .env
 

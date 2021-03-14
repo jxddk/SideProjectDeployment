@@ -69,57 +69,31 @@ class CmdHandler:
             self._run(docker + ["rm", "-rf", f"/etc/letsencrypt/live/{domain}"])
         except CalledProcessError:
             pass
-        if "wildcard" in args:
-            self._run(
-                docker
-                + [
-                    "certbot",
-                    "certonly",
-                    "--manual",
-                    "-w",
-                    "/var/www/certbot",
-                    "--preferred-challenges",
-                    "dns",
-                    "-d",
-                    "*." + domain,
-                    "--cert-name",
-                    domain,
-                    "--rsa-key-size",
-                    "4096",
-                    "--agree-tos",
-                    "--force-renewal",
-                    "--renew-by-default",
-                    "--non-interactive",
-                    "--email",
-                    email,
-                ]
-            )
-        else:
-            self._run(
-                docker
-                + [
-                    "certbot",
-                    "certonly",
-                    "--webroot",
-                    "-w",
-                    "/var/www/certbot",
-                    "--preferred-challenges",
-                    "http",
-                    "-d",
-                    domain,
-                    "--cert-name",
-                    domain,
-                    "--rsa-key-size",
-                    "4096",
-                    "--agree-tos",
-                    "--force-renewal",
-                    "--renew-by-default",
-                    "--non-interactive",
-                    "--email",
-                    email,
-                ]
-            )
-        self._run(["docker", "restart", f"{self._get_compose_project_name()}_nginx"])
+        self._run(
+            docker
+            + [
+                "certbot",
+                "certonly",
+                "--email",
+                email,
+                "-d",
+                domain,
+                "--cert-name",
+                domain,
+                "--webroot",
+                "-w",
+                "/var/www/certbot",
+                "--rsa-key-size",
+                "4096",
+                "--agree-tos",
+                "--force-renewal",
+                "--renew-by-default",
+                "--preferred-challenges",
+                "http",
+                "--non-interactive",
+            ]
+        )
+        self.docker_compose_reload()
 
 
 if __name__ == "__main__":
