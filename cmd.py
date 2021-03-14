@@ -58,8 +58,9 @@ class CmdHandler:
         self.docker_compose_up()
         compose_name = self._get_compose_project_name()
         docker = ["docker", "exec", f"{compose_name}_registry"]
+        auth_path = "auth/registry.password"
         self._run(docker + ["apk", "add", "apache2-utils"])
-        self._run(docker + ["htpasswd", "-B", "-b", "-c", "registry.password", usr, pw])
+        self._run(docker + ["htpasswd", "-B", "-b", "-c", auth_path, usr, pw])
 
     def certbot_new_domain(self, domain, email, *args, **kwargs):
         self.docker_compose_up()
