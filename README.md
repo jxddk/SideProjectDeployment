@@ -4,7 +4,7 @@ This repository is a template for a simple single-server multi-site deployment s
 
 ## Usage
 
-Make sure that you have Python 3.x and Docker Compose installed. Clone the repository and run `python cmd.py docker_compose_up`. On Linux, make sure that entrypoint scripts have execution permisisons (`chmod +x ./entrypoints/nginx.sh`) See "Extending" for instructions on extending the template to include other containers.
+Make sure that you have Python 3.x and Docker Compose installed. Clone the repository and run `python cmd.py docker_compose_up`. On Linux, make sure that entrypoint scripts have execution permissions. See "Extending" for instructions on extending the template to include other containers.
 
 ## Containers
 

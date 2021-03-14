@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from os import listdir
 from os.path import isfile
+from platform import system
 from shutil import copyfile
 from subprocess import CalledProcessError, run
 from sys import argv, version_info
@@ -88,8 +89,7 @@ class CmdHandler:
                 "4096",
                 "--agree-tos",
                 "--force-renewal",
-                "--preferred-challenges",
-                "http",
+                "--preferred-challenges=http",
                 "--non-interactive",
             ]
         )
@@ -97,14 +97,16 @@ class CmdHandler:
 
 
 if __name__ == "__main__":
-    if not isfile("./.env"):
-        copyfile("./default.env", ".env")
     if len(argv) < 2:
         argv.append("available_commands")
         if not hasattr(CmdHandler, argv[1]):
             raise ValueError("No argument passed to command script")
     if not (hasattr(CmdHandler, argv[1]) and callable(getattr(CmdHandler, argv[1]))):
         raise ValueError(f"The requested command {argv[1]} was not found")
+    if not isfile("./.env"):
+        copyfile("./default.env", ".env")
+    if system() == "Linux":
+        run(["chmod", "+x", "./entrypoints/*.sh"])
     handler = CmdHandler()
     result = getattr(CmdHandler(), argv[1])(*argv[2:])
     print(f"{argv[1]} completed{': ' + result if result else ''}")
