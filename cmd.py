@@ -64,7 +64,6 @@ class CmdHandler:
 
     def certbot_new_domain(self, domain, email, *args, **kwargs):
         self.docker_compose_up()
-        domain_scope = "*." + domain if "wildcard" in args else domain
         compose_name = self._get_compose_project_name()
         docker = ["docker", "exec", f"{compose_name}_certbot"]
         try:
@@ -79,7 +78,7 @@ class CmdHandler:
                 "--email",
                 email,
                 "-d",
-                domain_scope,
+                domain,
                 "--cert-name",
                 domain,
                 "--webroot",
@@ -89,7 +88,9 @@ class CmdHandler:
                 "4096",
                 "--agree-tos",
                 "--force-renewal",
-                "--preferred-challenges=http",
+                "--renew-by-default",
+                "--preferred-challenges",
+                "http",
                 "--non-interactive",
             ]
         )
