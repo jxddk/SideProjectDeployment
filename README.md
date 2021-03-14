@@ -12,7 +12,7 @@ This template includes three pre-configured Docker containers.
 
 ### Nginx
 
-[NGINX](https://hub.docker.com/_/nginx) is used to direct incoming web traffic to the appropriate project containers, including handling HTTP to HTTPS redirects and SSL certificates. The entrypoint script generates self-signed certificates for each domain given in the `DOMAINS` variable in the .env file (Certbot is used to generate live certificates), which allows NGINX to start before live certificates are generated.
+[NGINX](https://hub.docker.com/_/nginx) is used to direct incoming web traffic to the appropriate project containers, including handling HTTP to HTTPS redirects and SSL certificates. The entrypoint script generates self-signed certificates for each domain given in the `DOMAINS` variable in the .env file (Certbot is used to generate live certificates), which allows NGINX to start before live certificates are generated (`chmod +x ./entrypoints/*.sh`).
 
 ### Certbot
 
@@ -35,7 +35,7 @@ Management commands are collected in [cmd.py](./cmd.py), which is written for Py
 - `cmd.py docker_compose_down`: Spins down the aforementioned composition.
 - `cmd.py docker_compose_reload`: Restarts Docker composition.
 - `cmd.py registry_create_password <username> <password>`: Sets the authentication for the Docker registry to the given username and password.
-- `cmd.py certbot_new_domain <domain> <email>`: Gets a new certificate for the given domain, registered to the given email. This uses an HTTP verification challenge, which means wildcard certificates cannot be generated.
+- `cmd.py certbot_new_domain <domain> <email>`: Gets a new certificate for the given domain, registered to the given email. Add `wildcard` to the argument list to generate a wildcard certificate for the given domain (requires DNS verification).
 
 ## .env
 

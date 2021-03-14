@@ -21,6 +21,9 @@ http {
     sendfile on;
     gzip on;
 
+    ssl_certificate /etc/nginx/ssl/live/localhost/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/localhost/privkey.pem;
+
     # Redirects all HTTP traffic to HTTPS, except for Certbot HTTP challenges
     server {
         listen 80;

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from os import listdir
 from os.path import isfile
-from platform import system
 from shutil import copyfile
 from subprocess import CalledProcessError, run
 from sys import argv, version_info
@@ -70,31 +69,57 @@ class CmdHandler:
             self._run(docker + ["rm", "-rf", f"/etc/letsencrypt/live/{domain}"])
         except CalledProcessError:
             pass
-        self._run(
-            docker
-            + [
-                "certbot",
-                "certonly",
-                "--email",
-                email,
-                "-d",
-                domain,
-                "--cert-name",
-                domain,
-                "--webroot",
-                "-w",
-                "/var/www/certbot",
-                "--rsa-key-size",
-                "4096",
-                "--agree-tos",
-                "--force-renewal",
-                "--renew-by-default",
-                "--preferred-challenges",
-                "http",
-                "--non-interactive",
-            ]
-        )
-        self.docker_compose_reload()
+        if "wildcard" in args:
+            self._run(
+                docker
+                + [
+                    "certbot",
+                    "certonly",
+                    "--manual",
+                    "-w",
+                    "/var/www/certbot",
+                    "--preferred-challenges",
+                    "dns",
+                    "-d",
+                    "*." + domain,
+                    "--cert-name",
+                    domain,
+                    "--rsa-key-size",
+                    "4096",
+                    "--agree-tos",
+                    "--force-renewal",
+                    "--renew-by-default",
+                    "--non-interactive",
+                    "--email",
+                    email,
+                ]
+            )
+        else:
+            self._run(
+                docker
+                + [
+                    "certbot",
+                    "certonly",
+                    "--webroot",
+                    "-w",
+                    "/var/www/certbot",
+                    "--preferred-challenges",
+                    "http",
+                    "-d",
+                    domain,
+                    "--cert-name",
+                    domain,
+                    "--rsa-key-size",
+                    "4096",
+                    "--agree-tos",
+                    "--force-renewal",
+                    "--renew-by-default",
+                    "--non-interactive",
+                    "--email",
+                    email,
+                ]
+            )
+        self._run(["docker", "restart", f"{self._get_compose_project_name()}_nginx"])
 
 
 if __name__ == "__main__":
@@ -106,8 +131,6 @@ if __name__ == "__main__":
         raise ValueError(f"The requested command {argv[1]} was not found")
     if not isfile("./.env"):
         copyfile("./default.env", ".env")
-    if system() == "Linux":
-        run(["chmod", "+x", "./entrypoints/*.sh"], capture_output=True)
     handler = CmdHandler()
     result = getattr(CmdHandler(), argv[1])(*argv[2:])
     print(f"{argv[1]} completed{': ' + result if result else ''}")
