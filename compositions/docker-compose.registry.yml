@@ -1,0 +1,22 @@
+volumes:
+  registry-auth:
+  registry-data:
+
+services:
+  registry:
+    container_name: ${COMPOSE_PROJECT_NAME}_registry
+    image: registry:2.7.1
+    restart: always
+    volumes:
+      - registry-data:/data
+      - registry-auth:/auth
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/registry.password
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
