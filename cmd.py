@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from sys import argv, version_info
-from subprocess import run, CalledProcessError
 from os import listdir
+from subprocess import CalledProcessError, run
+from sys import argv, version_info
 
 
 class CmdHandler:
@@ -26,7 +26,7 @@ class CmdHandler:
             for line in f.readlines():
                 if not line.startswith("COMPOSE_PROJECT_NAME"):
                     continue
-                return line.replace(" ", "").split("=")[1]
+                return line.replace(" ", "").split("=")[1].replace("\n", "")
         raise ValueError("COMPOSE_PROJECT_NAME not specified in .env file")
 
     def _get_docker_compose_args(self):
