@@ -29,6 +29,7 @@ services:
       - ./nginx/:/deployment/nginx/
     environment:
       DOMAINS: ${DOMAINS}
+      CSR_SUBJ: ${CSR_SUBJ}
     entrypoint: /deployment/entrypoint.sh
     healthcheck:
       test: ["CMD-SHELL", "echo", "0", "||", "exit", "1"]

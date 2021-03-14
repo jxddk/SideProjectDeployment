@@ -12,7 +12,8 @@ do
   else
     mkdir -p /etc/nginx/ssl/live/$DOMAIN/
     apk add openssl
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/live/$DOMAIN/privkey.pem -out /etc/nginx/ssl/live/$DOMAIN/fullchain.pem
+    echo Generating certs for $DOMAIN
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/live/$DOMAIN/privkey.pem -out /etc/nginx/ssl/live/$DOMAIN/fullchain.pem -subj "$CSR_SUBJ"
   fi
 done
 chmod -R 444 /etc/nginx/ssl/live/

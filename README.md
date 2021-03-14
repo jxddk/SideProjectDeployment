@@ -2,6 +2,10 @@
 
 This repository is a template for a simple single-server multi-site deployment scheme, based on [NGINX](https://nginx.org/) and [Docker](https://docs.docker.com/compose/). This template makes it easier to manage multiple projects on a single server by setting up an extensible composition that serves most needs out of the box.
 
+## Usage
+
+Make sure that you have Python 3.x and Docker Compose installed. Clone the repository and run `python cmd.py docker_compose_up`. See "Extending" for instructions on extending the template to include other containers.
+
 ## Containers
 
 This template includes three pre-configured Docker containers.
@@ -35,7 +39,7 @@ Management commands are collected in [cmd.py](./cmd.py), which is written for Py
 
 ## .env
 
-This .env file is loaded across all docker-compose files. Therefore, any environment variables referenced in these files should be included here. By default, `COMPOSE_PROJECT_NAME` is set (to ensure that the container, network, and volume names are consistent), and `DOMAINS`, which is used by the NGINX entrypoint.
+This .env file is loaded across all docker-compose files. Therefore, any environment variables referenced in these files should be included here. By default, this includes `COMPOSE_PROJECT_NAME` (to ensure that the container, network, and volume names are consistent), and [`CSR_SUBJ`](https://www.openssl.org/docs/man1.0.2/man1/openssl-req.html) and `DOMAINS`, which are used by the NGINX entrypoint to generate self-signed certs.
 
 ## Extending
 
