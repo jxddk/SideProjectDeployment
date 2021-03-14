@@ -23,8 +23,8 @@ http {
 
     # Redirects all HTTP traffic to HTTPS, except for Certbot HTTP challenges
     server {
-        listen 80 http2;
-        listen [::]:80 http2;
+        listen 80;
+        listen [::]:80;
         server_name ~.;
 
         location ~ /.well-known/acme-challenge {
