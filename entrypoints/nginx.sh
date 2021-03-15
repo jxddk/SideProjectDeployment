@@ -13,7 +13,7 @@ echo Found domains: $domains
 
 for domain in $domains
 do
-  if [ -f /etc/nginx/ssl/live/$DOMAIN/privkey.pem ]
+  if [ -f /etc/nginx/ssl/live/$domain/privkey.pem ]
   then
     echo $domain already has certs, skipping
   else
