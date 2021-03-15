@@ -11,7 +11,7 @@ for domain in "$(grep -Erhiwo "/etc/nginx/ssl/live/(.*)/privkey.pem" "/deploymen
 done
 echo Found domains: $domains
 
-for domain in domains
+for domain in $domains
 do
   if [ -f /etc/nginx/ssl/live/$DOMAIN/privkey.pem ]
   then
