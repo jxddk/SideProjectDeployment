@@ -28,7 +28,6 @@ services:
       - ./config.nginx:/etc/nginx/nginx.conf
       - ./nginx/:/deployment/nginx/
     environment:
-      DOMAINS: ${DOMAINS}
       CSR_SUBJ: ${CSR_SUBJ}
     entrypoint: /deployment/entrypoint.sh
     healthcheck:

@@ -4,16 +4,23 @@
 # certbot later. nginx can't start if it points to non-existent cert files!
 # make sure that openssl saves the keys to the same path and filename as certbot
 mkdir -p /etc/nginx/ssl/live/localhost/
-for DOMAIN in $DOMAINS
+
+# selects domain names based on NGINX configuration, wherever an SSL key is defined
+for domain in "$(grep -Erhiwo "/etc/nginx/ssl/live/(.*)/privkey.pem" "/deployment/nginx" "/etc/nginx/nginx.conf" | cut -d "/" -f 6 | sort | uniq)"; do
+  domains="${domains:+$domains}$domain"
+done
+echo Found domains: $domains
+
+for domain in domains
 do
   if [ -f /etc/nginx/ssl/live/$DOMAIN/privkey.pem ]
   then
-    echo $DOMAIN already has certs, skipping
+    echo $domain already has certs, skipping
   else
-    mkdir -p /etc/nginx/ssl/live/$DOMAIN/
+    mkdir -p /etc/nginx/ssl/live/$domain/
     apk add openssl
-    echo Generating certs for $DOMAIN
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/live/$DOMAIN/privkey.pem -out /etc/nginx/ssl/live/$DOMAIN/fullchain.pem -subj "$CSR_SUBJ"
+    echo Generating certs for $domain
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/live/$domain/privkey.pem -out /etc/nginx/ssl/live/$domain/fullchain.pem -subj "$CSR_SUBJ"
   fi
 done
 chmod -R 444 /etc/nginx/ssl/live/
