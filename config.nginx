@@ -49,9 +49,7 @@ http {
         ssl_certificate /etc/nginx/ssl/live/localhost/fullchain.pem;
         ssl_certificate_key /etc/nginx/ssl/live/localhost/privkey.pem;
 
-        location / {
-            return 444;
-        }
+        return 444;
     }
 
 
