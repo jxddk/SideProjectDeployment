@@ -40,6 +40,21 @@ http {
         }
     }
 
+    # Redirects requests to invalid host to 404
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name ~.;
+
+        ssl_certificate /etc/nginx/ssl/live/localhost/fullchain.pem;
+        ssl_certificate_key /etc/nginx/ssl/live/localhost/privkey.pem;
+
+        location / {
+            return 444;
+        }
+    }
+
+
     include /deployment/nginx/*.nginx;
     include /deployment/nginx/*.conf;
 }
