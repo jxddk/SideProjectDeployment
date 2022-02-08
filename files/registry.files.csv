@@ -1,0 +1,3 @@
+src,dest
+./default/registry/docker-compose.registry.yml,docker-compose.registry.yml
+./default/registry/registry.nginx,nginx/registry.nginx

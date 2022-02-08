@@ -1,0 +1,5 @@
+src,dest
+./default/semaphore/docker-compose.semaphore.yml,docker-compose.semaphore.yml
+./default/semaphore/semaphore.nginx,nginx/semaphore.nginx
+./default/semaphore/semaphore.sh,semaphore/semaphore.sh
+./default/semaphore/semaphore.py,semaphore/semaphore.py

@@ -1,0 +1,48 @@
+version: "3"
+
+volumes:
+  certbot-certs:
+  certbot-challenges:
+
+services:
+  nginx:
+    container_name: ${COMPOSE_PROJECT_NAME}_nginx
+    image: nginx:1.19.6-alpine
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-challenges:/var/www/certbot
+      - certbot-certs:/etc/nginx/ssl
+      - ./nginx/nginx.sh:/deployment/entrypoint.sh
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/:/deployment/nginx/
+    environment:
+      CSR_SUBJ: ${CSR_SUBJ}
+    entrypoint: ["/bin/sh", "/deployment/entrypoint.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "echo", "0", "||", "exit", "1"]
+      interval: 10s
+      timeout: 5s
+      retries: 100
+
+  certbot:
+    container_name: ${COMPOSE_PROJECT_NAME}_certbot
+    image: certbot/certbot:latest
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100k"
+        max-file: "10"
+    volumes:
+      - certbot-challenges:/var/www/certbot
+      - certbot-certs:/etc/letsencrypt
+      - ./nginx/certbot.sh:/deployment/entrypoint.sh
+    entrypoint: ["/bin/sh", "/deployment/entrypoint.sh"]

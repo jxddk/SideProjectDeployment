@@ -1,0 +1,21 @@
+volumes:
+  semaphore-data:
+
+services:
+  semaphore:
+    container_name: ${COMPOSE_PROJECT_NAME}_semaphore
+    image: python:3.10.2-alpine3.15
+    restart: always
+    volumes:
+      - semaphore-data:/data
+      - ./semaphore/semaphore.sh:/deployment/entrypoint.sh
+      - ./semaphore/semaphore.py:/deployment/semaphore.py
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+    environment:
+      SEMAPHORE_PASSWORD: ${SEMAPHORE_PASSWORD}
+    working_dir: "/deployment"
+    entrypoint: ["/bin/sh", "/deployment/entrypoint.sh"]
