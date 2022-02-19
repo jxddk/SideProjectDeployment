@@ -118,7 +118,7 @@ files.
 Any `docker-compose.*.yml` files are automatically included in the project
 composition when `docker-compose` is run from [cmd.py](./cmd.py). Any files with
 the destination `nginx/*.nginx` will be included as fragments in
-[`nginx.conf`](./default/nginx/nginx.conf).
+[`nginx.nginx`](./default/nginx/nginx.nginx).
 
 A minimal extension consists of three files: a `*.files.csv` entry in `./files`,
 a `docker-compose.*.yml` file, and an Nginx fragment. Refer
@@ -133,20 +133,19 @@ An example NGINX configuration is as follows:
 
 ```nginx
 upstream example {
-    server example:8000;
+  server example:8000;
 }
 
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name example.com;
+  listen              443 ssl http2;
+  listen              [::]:443 ssl http2;
+  server_name         example.com;
+  ssl_certificate     /etc/nginx/ssl/live/example.com/fullchain.pem;
+  ssl_certificate_key /etc/nginx/ssl/live/example.com/privkey.pem;
 
-    ssl_certificate /etc/nginx/ssl/live/example.com/fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/live/example.com/privkey.pem;
-
-    location / {
-        proxy_pass http://example;
-    }
+  location / {
+    proxy_pass http://example;
+  }
 }
 ```
 

@@ -1,5 +1,5 @@
 src,dest
 ./default/nginx/docker-compose.nginx.yml,docker-compose.nginx.yml
-./default/nginx/nginx.conf,nginx/nginx.conf
+./default/nginx/nginx.nginx,nginx/nginx.nginx
 ./default/nginx/certbot.sh,nginx/certbot.sh
 ./default/nginx/nginx.sh,nginx/nginx.sh
