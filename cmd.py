@@ -39,7 +39,6 @@ class CmdHandler:
                 cmd,
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
-                shell=True,
                 text=True,
             )
         except TypeError as e:
