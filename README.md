@@ -118,7 +118,7 @@ files.
 Any `docker-compose.*.yml` files are automatically included in the project
 composition when `docker-compose` is run from [cmd.py](./cmd.py). Any files with
 the destination `nginx/*.nginx` will be included as fragments in
-[`nginx.nginx`](./default/nginx/nginx.nginx).
+[`nginx.nginx`](./default/nginx/nginx.nginxconf).
 
 A minimal extension consists of three files: a `*.files.csv` entry in `./files`,
 a `docker-compose.*.yml` file, and an Nginx fragment. Refer

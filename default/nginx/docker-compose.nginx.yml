@@ -21,7 +21,7 @@ services:
       - certbot-challenges:/var/www/certbot
       - certbot-certs:/etc/nginx/ssl
       - ./nginx/nginx.sh:/deployment/entrypoint.sh
-      - ./nginx/nginx.nginx:/etc/nginx/nginx.conf
+      - ./nginx/nginx.nginxconf:/etc/nginx/nginx.conf
       - ./nginx/:/deployment/nginx/
     environment:
       CSR_SUBJ: ${CSR_SUBJ}
