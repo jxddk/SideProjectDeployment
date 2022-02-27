@@ -97,7 +97,9 @@ class CmdHandler:
                                     ]
                                 )
                             except subprocess.CalledProcessError as e:
-                                warn(f"Error while pulling git repository: {e}")
+                                warn(
+                                    f"Error while pulling git repository at {line_data[1]}: {e}"
+                                )
                             continue
                         src_paths.append(line_data[0])
                         if line_data[1] in dest_paths:
