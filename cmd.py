@@ -262,7 +262,10 @@ class CmdHandler:
     ):
         last_update = 0
         while True:
-            if time() - last_update > float(interval_minutes) * 60:
+            if (
+                interval_minutes < 0
+                or time() - last_update > float(interval_minutes) * 60
+            ):
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 try:
                     last_update = time()
@@ -275,6 +278,8 @@ class CmdHandler:
                     return
                 except Exception as e:
                     print(timestamp, "Error:", str(e))
+            if interval_minutes < 0:
+                break
             else:
                 sleep(2.5)
 
