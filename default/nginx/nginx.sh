@@ -18,7 +18,7 @@ do
       exit 1
     fi
   done
-  envsubst $vars < $file | tee /deployment/nginx/$(basename $file)
+  envsubst "$vars" < $file | tee /deployment/nginx/$(basename $file)
 done
 
 # make some self-signed certs for served domains - these can be replaced by
