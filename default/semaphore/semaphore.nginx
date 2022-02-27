@@ -5,9 +5,9 @@ upstream semaphore {
 server {
     listen              443 ssl;
     listen              [::]:443 ssl;
-    server_name         ~^semaphore\..+\..+$;
-    ssl_certificate     /etc/nginx/ssl/live/localhost/fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/live/localhost/privkey.pem;
+    server_name         ${SEMAPHORE_HOST};
+    ssl_certificate     /etc/nginx/ssl/live/${SEMAPHORE_HOST}/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/${SEMAPHORE_HOST}/privkey.pem;
 
     location / {
         proxy_pass         http://semaphore;

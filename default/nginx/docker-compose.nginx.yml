@@ -7,7 +7,7 @@ volumes:
 services:
   nginx:
     container_name: ${COMPOSE_PROJECT_NAME}_nginx
-    image: nginx:1.19.6-alpine
+    image: nginx:1.21.6-alpine
     restart: always
     logging:
       driver: "json-file"
@@ -22,7 +22,8 @@ services:
       - certbot-certs:/etc/nginx/ssl
       - ./nginx/nginx.sh:/deployment/entrypoint.sh
       - ./nginx/nginx.nginxconf:/etc/nginx/nginx.conf
-      - ./nginx/:/deployment/nginx/
+      - ./nginx/:/deployment/nginx/templates
+    env_file: ./../${SIDEPROJECTDEPLOYMENT_ENV_PATH:-default.env}
     environment:
       CSR_SUBJ: ${CSR_SUBJ}
     entrypoint: ["/bin/sh", "/deployment/entrypoint.sh"]

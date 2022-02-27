@@ -5,9 +5,9 @@ upstream registry {
 server {
     listen              443 ssl;
     listen              [::]:443 ssl;
-    server_name         ~^registry\..+\..+$;
-    ssl_certificate     /etc/nginx/ssl/live/localhost/fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/live/localhost/privkey.pem;
+    server_name         ${REGISTRY_HOST};
+    ssl_certificate     /etc/nginx/ssl/live/${REGISTRY_HOST}/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/${REGISTRY_HOST}/privkey.pem;
 
     location / {
         client_max_body_size 5000M;
