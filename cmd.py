@@ -261,11 +261,9 @@ class CmdHandler:
         self, interval_minutes: Union[str, int, float], *args, **kwargs
     ):
         last_update = 0
+        interval_minutes = float(interval_minutes)
         while True:
-            if (
-                interval_minutes < 0
-                or time() - last_update > float(interval_minutes) * 60
-            ):
+            if interval_minutes < 0 or time() - last_update > interval_minutes * 60:
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 try:
                     last_update = time()
