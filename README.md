@@ -36,8 +36,8 @@ to automatically renew SSL certificates. It is included as part of the
 A [Docker registry container](https://hub.docker.com/_/registry) is included in
 this project. It serves as an easy way to manage project images, and as an
 example of how this template can be extended to deploy other containers. This
-registry requires authentication by default, and is configured to be served at
-any host with a `registry.` subdomain.
+registry requires authentication by default, and is served from the host
+specified with the `REGISTRY_HOST` environment variable.
 
 When deploying this template, be sure to configure the SSL cert paths in
 [registry.nginx](./default/registry/registry.nginx) to match the correct
@@ -53,9 +53,9 @@ and [registry.nginx](./default/registry/registry.nginx) for more.
 ### Semaphore
 
 Semaphore is a simple Python server that facilitates remotely updating the
-composition (for example, as part of a CI/CD process). By default, it is
-configured to be served at any host with a `semaphore.` subdomain. Requests to
-the server require a password, set via the `SEMAPHORE_PASSWORD` environment
+composition (for example, as part of a CI/CD process). It is served from the
+host specified with the `SEMAPHORE_HOST` environment variable. Requests to the
+server require a password, set via the `SEMAPHORE_PASSWORD` environment
 variable.
 
 Making a `POST` request to `semaphore.domain.com/?<SEMAPHORE_PASSWORD>` with a
