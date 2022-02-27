@@ -1,13 +1,14 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import subprocess
 from datetime import datetime
 from json import loads
-from os import chdir, environ, getcwd, makedirs, remove, symlink, walk
+from os import chdir, environ, getcwd, makedirs, remove, walk
 from os.path import abspath, dirname, isfile, join
 from shutil import copyfile
 from sys import argv, version_info
 from time import sleep, time
 from typing import List, Union
+from warnings import warn
 
 
 class CmdHandler:
@@ -95,8 +96,8 @@ class CmdHandler:
                                         "--ff-only",
                                     ]
                                 )
-                            except subprocess.CalledProcessError:
-                                pass
+                            except subprocess.CalledProcessError as e:
+                                warn(f"Error while pulling git repository: {e}")
                             continue
                         src_paths.append(line_data[0])
                         if line_data[1] in dest_paths:
@@ -106,25 +107,22 @@ class CmdHandler:
                             )
                         dest_paths.append(line_data[1])
 
-        for root, dirs, files in walk(self.TEMP_DIRECTORY):
-            for file in files:
-                file_path = join(root, file)
-                remove(file_path)
-
         if len(src_paths) != len(dest_paths):
             raise ValueError(
                 f"Length of src paths ({len(src_paths)} does not match"
                 f"length of dest paths {len(dest_paths)}."
             )
 
+        for root, dirs, files in walk(self.TEMP_DIRECTORY):
+            for file in files:
+                file_path = join(root, file)
+                remove(file_path)
+
         for index in range(len(src_paths)):
             dest_path = abspath(join(self.TEMP_DIRECTORY, dest_paths[index]))
             src_path = abspath(src_paths[index])
             makedirs(dirname(dest_path), exist_ok=True)
-            try:
-                symlink(src_path, dest_path)
-            except OSError:
-                copyfile(src_path, dest_path)
+            copyfile(src_path, dest_path)
 
     def docker_compose(self, *args, **kwargs):
         docker_args = self._docker_compose_args
