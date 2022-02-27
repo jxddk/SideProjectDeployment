@@ -111,7 +111,7 @@ New Docker images can be included in this composition by including an entry in
 the [`./files/`](./files) directory (with the extension `.files.csv`). The CSV
 should contain a list of source files and their destination - files will be
 copied to the path specified by `SIDEPROJECTDEPLOYMENT_TEMPDIR`. If the second
-line of the `*.files.csv` file is structures as `$GIT,<path>`, then the script
+line of the `*.files.csv` file is structured as `$GIT,<path>`, then the script
 will attempt to pull from the git repository at the given path before copying
 files.
 
