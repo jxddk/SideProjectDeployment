@@ -25,6 +25,12 @@ class Handler(BaseHTTPRequestHandler):
         self.error_content_type = "text/plain"
         self.error_message_format = ""
 
+    def do_GET(self):
+        self.send_response(400)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(bytes("400 Bad Request", "ascii"))
+
     def do_POST(self):
         # rate limiting
         client = self.client_address[0]
@@ -33,6 +39,7 @@ class Handler(BaseHTTPRequestHandler):
             security.rates[client] = time()
             if time() - last_time < security.limit:
                 self.send_response(429)
+                self.end_headers()
                 return
         else:
             security.rates[client] = time()
@@ -47,20 +54,24 @@ class Handler(BaseHTTPRequestHandler):
         # authentication
         if self.path != f"/?{security.password}":
             self.send_response(401)
+            self.end_headers()
             return
 
         # payload parsing
         content_length = int(self.headers["Content-Length"])
         post_data = self.rfile.read(content_length).decode("utf8")
         post_data = "".join(
-            [c for c in post_data if c in ascii_letters + digits + "-_:."]
+            [c for c in post_data if c in ascii_letters + digits + "-_:./"]
         )[:128]
         makedirs("/data", exist_ok=True)
         with open("/data/data.txt", "a") as f:
             f.write("\n")
             f.write(post_data)
 
-        self.send_response(204)
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(bytes("200 OK", "ascii"))
 
 
 if __name__ == "__main__":

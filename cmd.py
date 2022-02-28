@@ -7,7 +7,7 @@ from os.path import abspath, dirname, isfile, join
 from shutil import copyfile
 from sys import argv, version_info
 from time import sleep, time
-from typing import List, Union
+from typing import Union
 from warnings import warn
 
 
@@ -20,6 +20,7 @@ class CmdHandler:
     ENV_PATH = abspath(
         environ.get("SIDEPROJECTDEPLOYMENT_ENV_PATH", join(ROOT_DIRECTORY, "./.env"))
     )
+    SEMAPHORE_LOG_PATH = abspath(join(ROOT_DIRECTORY, "./.semaphore.log"))
     DEFAULT_ENV_PATH = abspath(join(ROOT_DIRECTORY, "./.env"))
 
     def version_info(self, *args, **kwargs):
@@ -166,47 +167,86 @@ class CmdHandler:
             ]
         )
         if response is None:
-            response = []
+            return []
         else:
-            response = [r for r in response.split("\n") if len(r) > 0]
-        return response
+            return sorted(list(set([r for r in response.split("\n") if len(r) > 0])))
 
-    def update_from_semaphore(self):
+    def update_from_semaphore(self, write_log: bool = False):
+        log_data = [
+            "Semaphore Update at " + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ]
         try:
-            semaphore = self.get_semaphore_updates()
-        except SystemError:
-            semaphore = []
-        if len(semaphore) <= 0:
-            return None
-        all_containers = self._run(
-            [
-                "docker",
-                "container",
-                "list",
-                "--no-trunc",
-                "--all",
-                "-f",
-                "name=^deployment_.+$",
-                "--format",
-                "{{.Names}} ||| {{.Image}}",
-            ]
-        )
-        containers_to_rebuild = []
-        images_to_pull = []
-        for container in all_containers.split("\n"):
-            if len(container) <= 0:
-                continue
-            container_name, container_image = tuple(container.split(" ||| "))
-            if container_image in semaphore or container_name in semaphore:
-                containers_to_rebuild.append(container_name)
-                images_to_pull.append(container_image)
-        for image in images_to_pull:
-            self._run(["docker", "pull", image])
-        for container in containers_to_rebuild:
-            self._run(["docker", "container", "stop", container])
-            self._run(["docker", "container", "rm", container, "-v"])
-        self.docker_compose("up")
-        return containers_to_rebuild
+            try:
+                semaphore = self.get_semaphore_updates()
+                log_data.append("\tFound Semaphore Response: " + ", ".join(semaphore))
+            except SystemError as e:
+                semaphore = []
+            if len(semaphore) <= 0:
+                return None
+            all_containers = self._run(
+                [
+                    "docker",
+                    "container",
+                    "list",
+                    "--no-trunc",
+                    "--all",
+                    "-f",
+                    "name=^deployment_.+$",
+                    "--format",
+                    "{{.Names}} ||| {{.Image}}",
+                ]
+            )
+            containers_to_rebuild = set()
+            images_to_pull = set()
+            for container in all_containers.split("\n"):
+                if len(container) <= 0:
+                    continue
+                container_name, container_image = tuple(container.split(" ||| "))
+                if container_image in semaphore or container_name in semaphore:
+                    containers_to_rebuild.add(container_name)
+                    images_to_pull.add(container_image)
+            for image in images_to_pull:
+                self._run(["docker", "pull", image])
+            log_data.append("\tPulled Images: " + ", ".join(images_to_pull))
+            for container in containers_to_rebuild:
+                self._run(["docker", "container", "stop", container])
+                self._run(["docker", "container", "rm", container, "-v"])
+            self.docker_compose("up")
+            log_data.append("\tRebuilt Containers: " + ", ".join(containers_to_rebuild))
+        except Exception as e:
+            log_data.append("\tERROR: " + str(e))
+
+        if write_log:
+            if not isfile(self.SEMAPHORE_LOG_PATH):
+                with open(self.SEMAPHORE_LOG_PATH, "w", encoding="utf-8") as f:
+                    f.write("")
+            with open(self.SEMAPHORE_LOG_PATH, "r", encoding="utf-8") as f:
+                old_data = [l.rstrip("\n") for l in f.readlines()]
+            while len(old_data) > 250 or (len(old_data) > 0 and old_data[0][0] == "\t"):
+                old_data.pop(0)
+            with open(self.SEMAPHORE_LOG_PATH, "w", encoding="utf-8") as f:
+                f.write("\n".join(old_data + log_data))
+        for line in log_data:
+            print(line)
+
+    def schedule_background_update(
+        self, interval_minutes: Union[str, int, float], *args, **kwargs
+    ):
+        last_update = 0
+        interval_minutes = float(interval_minutes)
+        while True:
+            if interval_minutes < 0 or time() - last_update > interval_minutes * 60:
+                try:
+                    last_update = time()
+                    self.update_from_semaphore(True)
+                except KeyboardInterrupt:
+                    return
+                except Exception as e:
+                    print("ERROR:", int(time()), str(e))
+            if interval_minutes < 0:
+                break
+            else:
+                sleep(2.5)
 
     def registry_create_password(self, usr, pw, *args, **kwargs):
         self.docker_compose("up")
@@ -257,32 +297,8 @@ class CmdHandler:
             if v.startswith(self._get_compose_project_name() + "_")
         ]
 
-    def schedule_background_update(
-        self, interval_minutes: Union[str, int, float], *args, **kwargs
-    ):
-        last_update = 0
-        interval_minutes = float(interval_minutes)
-        while True:
-            if interval_minutes < 0 or time() - last_update > interval_minutes * 60:
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                try:
-                    last_update = time()
-                    updated_containers = self.update_from_semaphore()
-                    if updated_containers is None:
-                        print(timestamp, "No update")
-                    else:
-                        print(timestamp, "Updated: " + ", ".join(updated_containers))
-                except KeyboardInterrupt:
-                    return
-                except Exception as e:
-                    print(timestamp, "Error:", str(e))
-            if interval_minutes < 0:
-                break
-            else:
-                sleep(2.5)
-
     @property
-    def _docker_compose_args(self) -> List[str]:
+    def _docker_compose_args(self) -> list[str]:
         args_attr = "_docker_compose_args_cached"
         if hasattr(self, args_attr):
             return self.__getattribute__(args_attr)
